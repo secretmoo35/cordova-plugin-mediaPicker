@@ -88,7 +88,12 @@
     [[PHImageManager defaultManager] requestImageDataForAsset:asset  options:options resultHandler:^(NSData * _Nullable imageData, NSString * _Nullable dataUTI, UIImageOrientation orientation, NSDictionary * _Nullable info) {
         if(imageData != nil) {
             NSString *filename=[asset valueForKey:@"filename"];
+            NSData *heicData = nil;
+            NSString *heicBase64 = nil;
             if ([filename hasSuffix:@".HEIC"]) {
+                heicData=[NSData dataWithData:imageData];
+                heicData=[heicData base64EncodedDataWithOptions:0];
+                heicBase64=[[NSString alloc] initWithData:heicData encoding:NSUTF8StringEncoding];
                 imageData = UIImageJPEGRepresentation([UIImage imageWithData:imageData], 1);
                 filename = [filename stringByReplacingOccurrencesOfString:@".HEIC" withString:@".JPG"];
             }
@@ -101,7 +106,7 @@
                 [self.commandDelegate sendPluginResult:[CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:[error localizedDescription]] callbackId:callbackId];
             } else {
                 
-                NSDictionary *dict=[NSDictionary dictionaryWithObjectsAndKeys:fullpath,@"path",[[NSURL fileURLWithPath:fullpath] absoluteString],@"uri",@"image",@"mediaType",size,@"size",[NSNumber numberWithInt:index],@"index", nil];
+                NSDictionary *dict=[NSDictionary dictionaryWithObjectsAndKeys:fullpath,@"path",[[NSURL fileURLWithPath:fullpath] absoluteString],@"uri",@"image",@"mediaType",size,@"size",[NSNumber numberWithInt:index],@"index",heicBase64,@"heicBase64",  nil];
                 [aListArray addObject:dict];
                 if([aListArray count]==[selectArray count]){
                     [self.commandDelegate sendPluginResult:[CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsArray:aListArray] callbackId:callbackId];
