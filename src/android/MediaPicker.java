@@ -218,7 +218,7 @@ public class MediaPicker extends CordovaPlugin {
             if (mediaType == 3) {
                 thumbImage = ThumbnailUtils.createVideoThumbnail(path, MediaStore.Images.Thumbnails.MINI_KIND);
             } else {
-                thumbImage = ThumbnailUtils.extractThumbnail(BitmapFactory.decodeFile(path), thumbnailW, thumbnailH);
+                thumbImage = BitmapFactory.decodeFile(path);
             }
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             thumbImage.compress(Bitmap.CompressFormat.JPEG, quality, baos);
