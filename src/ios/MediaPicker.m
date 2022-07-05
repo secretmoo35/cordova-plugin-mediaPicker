@@ -176,41 +176,29 @@
 }
 
 -(void)videoToSandboxCompress:(PHAsset *)asset dmcPickerPath:(NSString*)dmcPickerPath aListArray:(NSMutableArray*)aListArray selectArray:(NSMutableArray*)selectArray index:(int)index{
-    NSString *compressStartjs = [NSString stringWithFormat:@"MediaPicker.compressEvent('%@',%i)", @"start",index];
-    [self.commandDelegate evalJs:compressStartjs];
-    [[PHImageManager defaultManager] requestExportSessionForVideo:asset options:nil exportPreset:AVAssetExportPresetMediumQuality resultHandler:^(AVAssetExportSession *exportSession, NSDictionary *info) {
-        
+    [[PHImageManager defaultManager] requestAVAssetForVideo:asset options:nil resultHandler:^(AVAsset *avAsset, AVAudioMix *audioMix, NSDictionary *info)
+    {
+        if ([avAsset isKindOfClass:[AVURLAsset class]])
+        {
+            NSURL *url = [(AVURLAsset*)avAsset URL];
 
-        NSString *fullpath=[NSString stringWithFormat:@"%@/%@.%@", dmcPickerPath,[[NSProcessInfo processInfo] globallyUniqueString], @"mp4"];
-        NSURL *outputURL = [NSURL fileURLWithPath:fullpath];
-        
-        NSLog(@"this is the final path %@",outputURL);
-        
-        exportSession.outputFileType=AVFileTypeMPEG4;
-        
-        exportSession.outputURL=outputURL;
+            NSString *filename = [asset valueForKey:@"filename"];
+            NSString *fullpath=[NSString stringWithFormat:@"%@/%@", dmcPickerPath,filename];
 
-        [exportSession exportAsynchronouslyWithCompletionHandler:^{
-
-            if (exportSession.status == AVAssetExportSessionStatusFailed) {
-                NSString * errorString = [NSString stringWithFormat:@"videoToSandboxCompress failed %@",exportSession.error];
-               [self.commandDelegate sendPluginResult:[CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:errorString] callbackId:callbackId];
-                NSLog(@"failed");
-                
-            } else if(exportSession.status == AVAssetExportSessionStatusCompleted){
-                
-                NSLog(@"completed!");
-                NSString *compressCompletedjs = [NSString stringWithFormat:@"MediaPicker.compressEvent('%@',%i)", @"completed",index];
-                [self.commandDelegate evalJs:compressCompletedjs];
-                NSDictionary *dict=[NSDictionary dictionaryWithObjectsAndKeys:fullpath,@"path",[[NSURL fileURLWithPath:fullpath] absoluteString],@"uri",@"video",@"mediaType" ,[NSNumber numberWithInt:index],@"index", nil];
-                [aListArray addObject:dict];
-                if([aListArray count]==[selectArray count]){
-                    [self.commandDelegate sendPluginResult:[CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsArray:aListArray] callbackId:callbackId];
-                }
+            NSError *error;
+            NSURL *fileURL = [NSURL fileURLWithPath:fullpath];
+            if ([[NSFileManager defaultManager] copyItemAtURL:url
+                                                     toURL:fileURL
+                                                     error:&error]) {
+                NSLog(@"Copied correctly");
             }
-            
-        }];
-        
+
+            NSDictionary *dict=[NSDictionary dictionaryWithObjectsAndKeys:fullpath,@"path",[fileURL absoluteString],@"uri",@"video",@"mediaType" ,[NSNumber numberWithInt:index],@"index", nil];
+            [aListArray addObject:dict];
+            if([aListArray count]==[selectArray count]){
+                [self.commandDelegate sendPluginResult:[CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsArray:aListArray] callbackId:self->callbackId];
+            }
+        }
     }];
 }
 
