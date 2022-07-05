@@ -95,7 +95,7 @@
                 heicData=[heicData base64EncodedDataWithOptions:0];
                 heicBase64=[[NSString alloc] initWithData:heicData encoding:NSUTF8StringEncoding];
                 imageData = UIImageJPEGRepresentation([UIImage imageWithData:imageData], 1);
-                filename = [filename stringByReplacingOccurrencesOfString:@".HEIC" withString:@".JPG"];
+                //filename = [filename stringByReplacingOccurrencesOfString:@".HEIC" withString:@".JPG"];
             }
             NSString *fullpath=[NSString stringWithFormat:@"%@/%@%@", dmcPickerPath,[[NSProcessInfo processInfo] globallyUniqueString], filename];
             NSNumber *size=[NSNumber numberWithLong:imageData.length];
@@ -106,7 +106,7 @@
                 [self.commandDelegate sendPluginResult:[CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:[error localizedDescription]] callbackId:callbackId];
             } else {
                 
-                NSDictionary *dict=[NSDictionary dictionaryWithObjectsAndKeys:fullpath,@"path",[[NSURL fileURLWithPath:fullpath] absoluteString],@"uri",@"image",@"mediaType",size,@"size",[NSNumber numberWithInt:index],@"index",heicBase64,@"heicBase64",  nil];
+                NSDictionary *dict=[NSDictionary dictionaryWithObjectsAndKeys:fullpath,@"path",[[NSURL fileURLWithPath:fullpath] absoluteString],@"uri",@"image",@"mediaType",size,@"size",filename,@"name",[NSNumber numberWithInt:index],@"index",heicBase64,@"heicBase64",  nil];
                 [aListArray addObject:dict];
                 if([aListArray count]==[selectArray count]){
                     [self.commandDelegate sendPluginResult:[CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsArray:aListArray] callbackId:callbackId];
@@ -163,7 +163,7 @@
                 [self.commandDelegate sendPluginResult:[CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:[error localizedDescription]] callbackId:callbackId];
             } else {
                 
-                NSDictionary *dict=[NSDictionary dictionaryWithObjectsAndKeys:fullpath,@"path",[[NSURL fileURLWithPath:fullpath] absoluteString],@"uri",size,@"size",@"video",@"mediaType" ,[NSNumber numberWithInt:index],@"index", nil];
+                NSDictionary *dict=[NSDictionary dictionaryWithObjectsAndKeys:fullpath,@"path",[[NSURL fileURLWithPath:fullpath] absoluteString],@"uri",size,@"size",@"video",@"mediaType",filename,@"name",[NSNumber numberWithInt:index],@"index", nil];
                 [aListArray addObject:dict];
                 if([aListArray count]==[selectArray count]){
                     [self.commandDelegate sendPluginResult:[CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsArray:aListArray] callbackId:callbackId];
