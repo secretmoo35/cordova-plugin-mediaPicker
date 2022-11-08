@@ -193,7 +193,7 @@
                 NSLog(@"Copied correctly");
             }
 
-            NSDictionary *dict=[NSDictionary dictionaryWithObjectsAndKeys:fullpath,@"path",[fileURL absoluteString],@"uri",@"video",@"mediaType" ,[NSNumber numberWithInt:index],@"index", nil];
+            NSDictionary *dict=[NSDictionary dictionaryWithObjectsAndKeys:fullpath,@"path",[fileURL absoluteString],@"uri",@"video",@"mediaType",filename,@"name",[NSNumber numberWithInt:index],@"index", nil];
             [aListArray addObject:dict];
             if([aListArray count]==[selectArray count]){
                 [self.commandDelegate sendPluginResult:[CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsArray:aListArray] callbackId:self->callbackId];
