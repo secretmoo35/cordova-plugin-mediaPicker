@@ -15,6 +15,9 @@ use npm OR github:
   cordova plugin add https://github.com/DmcSDK/cordova-plugin-mediaPicker.git --variable IOS_PHOTO_LIBRARY_USAGE_DESCRIPTION="your usage message"
 ```
 
+## Important installation steps
+Android: add `android:requestLegacyExternalStorage="true"` to `application <- AndroidManifest.xml`
+
 ## Example
 html code:
 
